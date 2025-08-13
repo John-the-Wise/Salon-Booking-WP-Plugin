@@ -1,0 +1,93 @@
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/wp-cache-config.php
+wp-content/blogs.dir/
+
+# Development files
+node_modules/
+npm-debug.log
+yarn-error.log
+.sass-cache/
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+error_log
+debug.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test files (exclude from production)
+test-*.php
+*-test.php
+simple-test.php
+ajax-test.php
+debug-*.php
+client-demo.php
+manual-test.php
+simple-ajax-test.php
+test-booking-*.php
+test-wordpress-booking.php
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Composer
+vendor/
+composer.lock
+
+# Package managers
+package-lock.json
+yarn.lock
+
+# Build files
+build/
+dist/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Database dumps
+*.sql
+*.sqlite
+
+# Security
+*.pem
+*.key
+*.crt
+
+# Plugin specific
+/uploads/
+/cache/
+/logs/
