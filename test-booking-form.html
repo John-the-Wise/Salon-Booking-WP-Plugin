@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon Booking Form - Test</title>
+    <link rel="stylesheet" href="public/css/salon-booking-public.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        /* Mock WordPress styles */
+        .wp-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Demo notice */
+        .demo-notice {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 30px;
+            color: #1976d2;
+        }
+        
+        .demo-notice h3 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        
+        .demo-notice ul {
+            margin: 10px 0 0 20px;
+        }
+        
+        /* Calendar styles */
+        .calendar-widget {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            background: #007cba;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .calendar-nav:hover {
+            background: #005a87;
+        }
+        
+        .calendar-month {
+            margin: 0;
+            color: #333;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-weekdays span {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            color: #666;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            text-align: center;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+            background: #f9f9f9;
+        }
+        
+        .calendar-day.available:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .calendar-day.selected {
+            background: #2196f3;
+            color: white;
+            border-color: #2196f3;
+        }
+        
+        /* Time slots styles */
+        .time-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .time-slot {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .time-slot:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .time-slot.selected {
+            background: #2196f3;
+            color: white;
+            border-color: #2196f3;
+        }
+        
+        #available-times h5 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="wp-container">
+        <div class="demo-notice">
+            <h3>🎉 Dynamic Booking Form Demo</h3>
+            <p>This demonstrates the enhanced booking form with dynamic loading:</p>
+            <ul>
+                <li><strong>Services:</strong> Load dynamically via AJAX</li>
+                <li><strong>Staff Selection:</strong> Only shown when multiple staff members exist</li>
+                <li><strong>Calendar & Time Slots:</strong> Load when needed</li>
+                <li><strong>Responsive Design:</strong> Works on all devices</li>
+            </ul>
+        </div>
+        
+        <!-- Mock booking form structure -->
+        <div class="salon-booking-container">
+            <div class="salon-booking-header">
+                <h2 class="salon-booking-title">Book Your Appointment</h2>
+                <p class="salon-booking-subtitle">Experience personalized beauty services designed to enhance your natural glow</p>
+            </div>
+
+            <form id="salon-booking-form" class="salon-booking-form">
+                <!-- Step 1: Service Selection -->
+                <div class="booking-step active" id="step-service">
+                    <div class="step-header">
+                        <h3>Select Your Service</h3>
+                        <p>Choose from our range of beauty treatments</p>
+                    </div>
+                    
+                    <div class="services-grid">
+                        <div class="services-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading services...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn-next" id="btn-next-staff" disabled>Next: Select Staff</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Staff Selection -->
+                <div class="booking-step" id="step-staff" style="display: none;">
+                    <div class="step-header">
+                        <h3>Select Your Preferred Staff Member</h3>
+                        <p>Choose who you'd like to provide your service</p>
+                    </div>
+                    
+                    <div class="staff-grid">
+                        <div class="staff-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading staff...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn-prev" id="btn-prev-service">Previous</button>
+                        <button type="button" class="btn-next" id="btn-next-datetime" disabled>Next: Select Date & Time</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Date & Time Selection -->
+                <div class="booking-step" id="step-datetime">
+                    <div class="step-header">
+                        <h3>Select Date & Time</h3>
+                        <p>Choose your preferred appointment date and time</p>
+                    </div>
+                    
+                    <div class="datetime-container">
+                        <div class="date-selection">
+                            <h4>Select Date</h4>
+                            <div id="booking-calendar"></div>
+                        </div>
+                        
+                        <div class="time-selection">
+                            <h4>Available Times</h4>
+                            <div id="available-times" class="time-slots">
+                                <p class="select-date-first">Please select a date first</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-navigation">
+                        <button type="button" class="btn-prev" id="btn-prev-staff">Previous</button>
+                        <button type="button" class="btn-next" id="btn-next-details" disabled>Next: Your Details</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mock data and scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <!-- Mock WordPress localized data for testing -->
+    <script>
+        // Mock salon_booking_ajax object that would normally be created by WordPress wp_localize_script
+        window.salon_booking_ajax = {
+            ajax_url: '/wp-admin/admin-ajax.php',
+            nonce: 'mock_nonce_for_testing',
+            stripe_publishable_key: 'pk_test_mock_key',
+            currency: 'ZAR',
+            currency_symbol: 'R',
+            booking_page_url: '/book-appointment/',
+            strings: {
+                select_service: 'Please select a service',
+                select_date: 'Please select a date',
+                select_time: 'Please select a time',
+                fill_details: 'Please fill in all required details',
+                booking_success: 'Booking confirmed successfully!',
+                booking_error: 'There was an error processing your booking.',
+                payment_error: 'Payment processing failed.',
+                invalid_email: 'Please enter a valid email address.',
+                invalid_phone: 'Please enter a valid phone number.'
+            }
+        };
+    </script>
+    
+    <script>
+        // Mock data for demonstration
+        const mockServices = [
+            {
+                id: 1,
+                name: "Classic Facial",
+                description: "Deep cleansing and moisturizing facial treatment",
+                duration: 60,
+                price: 150.00,
+                upfront_fee: 50.00,
+                category: "Facial Treatments"
+            },
+            {
+                id: 2,
+                name: "Luxury Manicure",
+                description: "Complete nail care with premium polish",
+                duration: 45,
+                price: 80.00,
+                upfront_fee: 25.00,
+                category: "Nail Services"
+            },
+            {
+                id: 3,
+                name: "Hair Styling",
+                description: "Professional hair cut and styling",
+                duration: 90,
+                price: 200.00,
+                upfront_fee: 75.00,
+                category: "Hair Services"
+            }
+        ];
+
+        const mockStaff = [
+            {
+                id: 1,
+                name: "Sarah Johnson",
+                specialties: '["Facial Treatments", "Skincare"]',
+                is_owner: true
+            },
+            {
+                id: 2,
+                name: "Emma Davis",
+                specialties: '["Hair Services", "Styling"]',
+                is_owner: false
+            }
+        ];
+
+        // Mock salon_booking_ajax object
+        window.salon_booking_ajax = {
+            currency_symbol: 'R'
+        };
+
+        // Add hidden fields
+        $('body').append('<input type="hidden" id="staff_data" value="' + JSON.stringify(mockStaff).replace(/"/g, '&quot;') + '">');
+        $('body').append('<input type="hidden" id="has_multiple_staff" value="1">');
+
+        // Simulate dynamic loading
+        $(document).ready(function() {
+            setTimeout(function() {
+                displayMockServices();
+            }, 1500);
+        });
+
+        function displayMockServices() {
+            const $servicesGrid = $('.services-grid');
+            const currencySymbol = 'R';
+            
+            // Group services by category
+            const servicesByCategory = {};
+            mockServices.forEach(service => {
+                if (!servicesByCategory[service.category]) {
+                    servicesByCategory[service.category] = [];
+                }
+                servicesByCategory[service.category].push(service);
+            });
+            
+            let html = '';
+            
+            Object.keys(servicesByCategory).forEach(category => {
+                html += `<div class="service-category">`;
+                html += `<h4 class="category-title">${category}</h4>`;
+                html += `<div class="category-services">`;
+                
+                servicesByCategory[category].forEach(service => {
+                    html += `
+                        <div class="service-card" data-service-id="${service.id}" 
+                             data-duration="${service.duration}" 
+                             data-price="${service.price}"
+                             data-upfront-fee="${service.upfront_fee}">
+                            <div class="service-info">
+                                <h5 class="service-name">${service.name}</h5>
+                                <p class="service-description">${service.description}</p>
+                                <div class="service-details">
+                                    <span class="service-duration">${service.duration} min</span>
+                                    <span class="service-price">${currencySymbol}${parseFloat(service.price).toFixed(2)}</span>
+                                </div>
+                                <div class="service-upfront">
+                                    <small>Upfront fee: ${currencySymbol}${parseFloat(service.upfront_fee).toFixed(2)}</small>
+                                </div>
+                            </div>
+                            <div class="service-select">
+                                <button type="button" class="btn-select-service">Select</button>
+                            </div>
+                            
+                            <div class="service-continue-container" style="display: none;">
+                                <div class="continue-button-wrapper">
+                                    <div class="selected-service-summary">
+                                        <span class="summary-service-name"></span>
+                                        <span class="summary-service-price"></span>
+                                    </div>
+                                    <button type="button" class="btn-continue-inline" data-next="staff">Continue to Staff Selection</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            $servicesGrid.html(html);
+        }
+
+        // Basic interaction demo
+        $(document).on('click', '.btn-select-service', function() {
+            $('.service-card').removeClass('selected');
+            $(this).closest('.service-card').addClass('selected');
+            $('.service-continue-container').hide();
+            $(this).closest('.service-card').find('.service-continue-container').show();
+            $('#btn-next-staff').prop('disabled', false);
+        });
+
+        $(document).on('click', '.btn-continue-inline', function() {
+            const nextStep = $(this).data('next');
+            if (nextStep === 'staff') {
+                showMockStaffStep();
+            }
+        });
+
+        function showMockStaffStep() {
+            $('.booking-step').removeClass('active');
+            $('#step-staff').show().addClass('active');
+            
+            setTimeout(function() {
+                displayMockStaff();
+            }, 800);
+        }
+
+        function displayMockStaff() {
+            const $staffGrid = $('.staff-grid');
+            
+            let html = '';
+            
+            mockStaff.forEach(staffMember => {
+                const specialties = JSON.parse(staffMember.specialties);
+                const specialtiesText = specialties.join(', ');
+                
+                html += `
+                    <div class="staff-card" data-staff-id="${staffMember.id}">
+                        <div class="staff-info">
+                            <h5 class="staff-name">${staffMember.name}</h5>
+                            ${staffMember.is_owner ? '<span class="staff-badge owner">Owner</span>' : ''}
+                            <div class="staff-specialties">
+                                <strong>Specialties:</strong>
+                                <span>${specialtiesText}</span>
+                            </div>
+                        </div>
+                        <div class="staff-select">
+                            <button type="button" class="btn-select-staff">Select</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            $staffGrid.html(html);
+        }
+
+        $(document).on('click', '.btn-select-staff', function() {
+            $('.staff-card').removeClass('selected');
+            $(this).closest('.staff-card').addClass('selected');
+            $('#btn-next-datetime').prop('disabled', false);
+        });
+
+        // Navigation button handlers
+        $(document).on('click', '#btn-next-staff', function() {
+            showMockStaffStep();
+        });
+
+        $(document).on('click', '#btn-next-datetime', function() {
+            showMockDateTimeStep();
+        });
+
+        $(document).on('click', '#btn-prev-service', function() {
+            $('.booking-step').removeClass('active');
+            $('#step-service').addClass('active');
+        });
+
+        $(document).on('click', '#btn-prev-staff', function() {
+            $('.booking-step').removeClass('active');
+            $('#step-staff').show().addClass('active');
+        });
+
+        function showMockDateTimeStep() {
+            $('.booking-step').removeClass('active');
+            $('#step-datetime').show().addClass('active');
+            
+            setTimeout(function() {
+                displayMockCalendar();
+            }, 500);
+        }
+
+        function displayMockCalendar() {
+            const $calendar = $('#booking-calendar');
+            const $timeSlots = $('#available-times');
+            
+            // Mock calendar HTML
+            const calendarHtml = `
+                <div class="calendar-widget">
+                    <div class="calendar-header">
+                        <button type="button" class="calendar-nav prev">&lt;</button>
+                        <h4 class="calendar-month">December 2024</h4>
+                        <button type="button" class="calendar-nav next">&gt;</button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-weekdays">
+                            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                        </div>
+                        <div class="calendar-days">
+                            <span class="calendar-day disabled">1</span>
+                            <span class="calendar-day disabled">2</span>
+                            <span class="calendar-day disabled">3</span>
+                            <span class="calendar-day disabled">4</span>
+                            <span class="calendar-day disabled">5</span>
+                            <span class="calendar-day disabled">6</span>
+                            <span class="calendar-day disabled">7</span>
+                            <span class="calendar-day disabled">8</span>
+                            <span class="calendar-day disabled">9</span>
+                            <span class="calendar-day disabled">10</span>
+                            <span class="calendar-day disabled">11</span>
+                            <span class="calendar-day disabled">12</span>
+                            <span class="calendar-day disabled">13</span>
+                            <span class="calendar-day disabled">14</span>
+                            <span class="calendar-day available" data-date="2024-12-15">15</span>
+                            <span class="calendar-day available" data-date="2024-12-16">16</span>
+                            <span class="calendar-day available" data-date="2024-12-17">17</span>
+                            <span class="calendar-day available" data-date="2024-12-18">18</span>
+                            <span class="calendar-day available" data-date="2024-12-19">19</span>
+                            <span class="calendar-day available" data-date="2024-12-20">20</span>
+                            <span class="calendar-day available" data-date="2024-12-21">21</span>
+                            <span class="calendar-day available" data-date="2024-12-22">22</span>
+                            <span class="calendar-day available" data-date="2024-12-23">23</span>
+                            <span class="calendar-day disabled">24</span>
+                            <span class="calendar-day disabled">25</span>
+                            <span class="calendar-day available" data-date="2024-12-26">26</span>
+                            <span class="calendar-day available" data-date="2024-12-27">27</span>
+                            <span class="calendar-day available" data-date="2024-12-28">28</span>
+                            <span class="calendar-day available" data-date="2024-12-29">29</span>
+                            <span class="calendar-day available" data-date="2024-12-30">30</span>
+                            <span class="calendar-day available" data-date="2024-12-31">31</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $calendar.html(calendarHtml);
+        }
+
+        // Calendar date selection
+        $(document).on('click', '.calendar-day.available', function() {
+            $('.calendar-day').removeClass('selected');
+            $(this).addClass('selected');
+            
+            const selectedDate = $(this).data('date');
+            displayMockTimeSlots(selectedDate);
+        });
+
+        function displayMockTimeSlots(date) {
+            const $timeSlots = $('#available-times');
+            
+            const mockTimes = [
+                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
+            ];
+            
+            let html = '<h5>Available Times for ' + new Date(date).toLocaleDateString() + '</h5>';
+            html += '<div class="time-slots-grid">';
+            
+            mockTimes.forEach(time => {
+                html += `<button type="button" class="time-slot" data-time="${time}">${time}</button>`;
+            });
+            
+            html += '</div>';
+            $timeSlots.html(html);
+        }
+
+        // Time slot selection
+        $(document).on('click', '.time-slot', function() {
+            $('.time-slot').removeClass('selected');
+            $(this).addClass('selected');
+            $('#btn-next-details').prop('disabled', false);
+        });
+
+        $(document).on('click', '#btn-next-details', function() {
+            alert('🎉 Booking flow complete! In the real plugin, this would proceed to customer details and payment.');
+        });
+    </script>
+</body>
+</html>

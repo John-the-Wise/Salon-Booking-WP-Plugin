@@ -1,0 +1,97 @@
+/* FullCalendar CSS - Local fallback */
+@import url('https://unpkg.com/fullcalendar@6.1.10/index.global.min.css');
+
+/* Basic fallback styles if import fails */
+.fc {
+  direction: ltr;
+  text-align: left;
+}
+
+.fc table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 1em;
+}
+
+.fc th {
+  text-align: center;
+}
+
+.fc th,
+.fc td {
+  border-style: solid;
+  border-width: 1px;
+  padding: 0;
+  vertical-align: top;
+}
+
+.fc-header-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fc-button {
+  background: #2271b1;
+  border: 1px solid #2271b1;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 13px;
+  line-height: 2.15384615;
+  margin: 0;
+  padding: 0 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.fc-button:hover {
+  background: #135e96;
+  border-color: #135e96;
+}
+
+.fc-event {
+  background-color: #3788d8;
+  border: 1px solid #3788d8;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 1px;
+  padding: 2px 4px;
+}
+
+.fc-daygrid-day {
+  background: #fff;
+}
+
+.fc-daygrid-day:hover {
+  background: #f6f7f7;
+}
+
+.fc-day-today {
+  background: #fff3cd !important;
+}
+
+.fc-scrollgrid {
+  border: 1px solid #ddd;
+  width: 100%;
+}
+
+.fc-col-header-cell {
+  background: #f1f1f1;
+  font-weight: bold;
+  padding: 8px;
+  text-align: center;
+}
+
+.fc-daygrid-day-number {
+  color: #2271b1;
+  font-weight: bold;
+  padding: 4px;
+  text-decoration: none;
+}
+
+.fc-daygrid-day-number:hover {
+  background: #f0f0f1;
+  color: #135e96;
+}
